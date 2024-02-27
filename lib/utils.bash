@@ -43,12 +43,12 @@ get_arch() {
 	arch=$(uname -m)
 
 	case $arch in
-		amd64 | x86_64)
-			echo 'amd64'
-			;;
-		arm64 | aarch64)
-			echo 'arm64'
-			;;
+	amd64 | x86_64)
+		echo 'amd64'
+		;;
+	arm64 | aarch64)
+		echo 'arm64'
+		;;
 	esac
 }
 
