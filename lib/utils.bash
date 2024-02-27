@@ -30,26 +30,26 @@ list_github_tags() {
 }
 
 list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
 	# Change this function if bazelisk has other means of determining installable versions.
 	list_github_tags
 }
 
 get_platform() {
-	echo $(uname -s | tr '[:upper:]' '[:lower:]')
+	uname -s | tr '[:upper:]' '[:lower:]'
 }
 
 get_arch() {
-  local arch=$(uname -m)
+	local arch
+	arch=$(uname -m)
 
-  case $arch in
-    amd64 | x86_64)
-      echo 'amd64'
-      ;;
-    arm64 | aarch64)
-      echo 'arm64'
-      ;;
-  esac
+	case $arch in
+		amd64 | x86_64)
+			echo 'amd64'
+			;;
+		arm64 | aarch64)
+			echo 'arm64'
+			;;
+	esac
 }
 
 download_release() {
@@ -79,7 +79,7 @@ install_version() {
 
 	(
 		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/bazelisk-$version "$install_path/bazelisk"
+		cp -r "$ASDF_DOWNLOAD_PATH/bazelisk-$version" "$install_path/bazelisk"
 
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
