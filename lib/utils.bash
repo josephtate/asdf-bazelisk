@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for bazelisk.
 GH_REPO="https://github.com/bazelbuild/bazelisk"
 TOOL_NAME="bazelisk"
 TOOL_TEST="bazelisk --print_env"
@@ -36,16 +35,37 @@ list_all_versions() {
 	list_github_tags
 }
 
+get_platform() {
+	echo $(uname -s | tr '[:upper:]' '[:lower:]')
+}
+
+get_arch() {
+  local arch=$(uname -m)
+
+  case $arch in
+    amd64 | x86_64)
+      echo 'amd64'
+      ;;
+    arm64 | aarch64)
+      echo 'arm64'
+      ;;
+  esac
+}
+
 download_release() {
-	local version filename url
+	local version filename url ext
 	version="$1"
 	filename="$2"
 
-	# TODO: Adapt the release URL convention for bazelisk
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	ext=$(get_platform)-$(get_arch)
+
+	# https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-darwin-amd64
+	url="$GH_REPO/releases/download/v${version}/bazelisk-${ext}"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
+
+	chmod +x "$filename"
 }
 
 install_version() {
@@ -59,9 +79,8 @@ install_version() {
 
 	(
 		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+		cp -r "$ASDF_DOWNLOAD_PATH"/bazelisk-$version "$install_path/bazelisk"
 
-		# TODO: Assert bazelisk executable exists.
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
